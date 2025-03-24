@@ -10,7 +10,26 @@ global:
 ingress:
     enabled: true
 
+
+## shared
+
+shared:
+    db:
+        type: "pgsql"
+        # [mysql, pgsql]
+        mysql:
+            username: "foo"
+        pgsql:
+            username: "foo"
+
 ## services
+
+services:
+    vault: false
+    rabbitmq: false
+    minio: false
+    mysql: false
+    redis: false
 
 vault:
     server:

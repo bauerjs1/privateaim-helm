@@ -7,3 +7,10 @@ ingress:
     hostname: ""
     path: ""
     pathType: "Prefix"
+
+shared:
+    db:
+        mysql:
+            database: core
+        pgsql:
+            database: core

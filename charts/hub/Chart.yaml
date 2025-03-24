@@ -15,25 +15,34 @@ version: "0.1.0"
 appVersion: "0.1.0"
 
 dependencies:
-    -   name: mysql
+    -   condition: services.mysql
+        name: mysql
         version: 11.1.15
         repository: https://charts.bitnami.com/bitnami
 
-    -   name: redis
+    -   condition: services.redis
+        name: redis
         version: 20.0.2
         repository: https://charts.bitnami.com/bitnami
 
-    -   name: rabbitmq
+    -   condition: services.rabbitmq
+        name: rabbitmq
         version: 14.6.6
         repository: https://charts.bitnami.com/bitnami
 
-    -   name: minio
+    -   condition: services.minio
+        name: minio
         version: 14.7.0
         repository: https://charts.bitnami.com/bitnami
 
-    -   name: vault
+    -   condition: services.vault
+        name: vault
         version: 0.28.1
         repository: https://helm.releases.hashicorp.com
+
+    -   name: shared
+        repository: file://../shared
+        version: 0.1.0
 
     -   name: authup
         repository: file://../third-party/authup

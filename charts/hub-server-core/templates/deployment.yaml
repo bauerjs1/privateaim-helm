@@ -73,15 +73,15 @@ spec:
               -   name: SKIP_ANALYSIS_APPROVAL
                   value: "true"
               -   name: DB_TYPE
-                  value: "mysql"
+                  value: "{{- include "db.type" .Subcharts.shared | trim }}"
               -   name: DB_HOST
-                  value: "{{ .Release.Name }}-hub-mysql-primary"
+                  value: "{{- include "db.host" .Subcharts.shared | trim }}"
               -   name: DB_USERNAME
-                  value: "root"
+                  value: "{{- include "db.user" .Subcharts.shared | trim }}"
               -   name: DB_PASSWORD
-                  value: "start123"
+                  value: "{{- include "db.password" .Subcharts.shared | trim }}"
               -   name: DB_DATABASE
-                  value: "core"
+                  value: "{{- include "db.database" .Subcharts.shared | trim }}"
           resources:
               requests:
                   memory: "512Mi"
