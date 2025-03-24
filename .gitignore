@@ -1,6 +1,5 @@
 .idea
 *.lock
 *.tgz
-.helm-index
-.helm-packages
+.hevi
 node_modules

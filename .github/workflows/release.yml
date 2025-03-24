@@ -27,7 +27,7 @@ jobs:
           with:
             token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: tada5hi/hevi-action@v1.2
+      - uses: tada5hi/hevi-action@v1.3
         if: steps.release.outputs.releases_created == 'true'
         with:
           directory: charts
