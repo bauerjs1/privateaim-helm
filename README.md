@@ -1,6 +1,6 @@
 # Flame: Helm Repository 📦
 
-This repository contains helm charts for FLAME.
+This repository contains all helm charts for FLAME.
 
 > 🚧 **Work in Progress**
 >
@@ -22,8 +22,27 @@ the latest versions of the packages.  You can then run `helm search repo flame` 
 
 To install the <chart-name> chart:
 
-    helm install <chart-name> flame/<chart-name>
+```shell
+helm install <chart-name> flame/<chart-name>
+```
 
 To uninstall the chart:
+```shell
+helm delete <chart-name>
+```
 
-    helm delete <chart-name>
+### Hub
+
+To install the hub chart:
+```shell
+helm install <chart-name> flame/flame-hub
+```
+
+### Node
+
+To install the node chart:
+```shell
+helm install <chart-name> flame/flame-node
+```
+
+
