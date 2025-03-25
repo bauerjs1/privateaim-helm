@@ -39,7 +39,7 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
-      - uses: tada5hi/hevi-action@v1.3
+      - uses: tada5hi/hevi-action@v1.4
         if: steps.release.outputs.releases_created == 'true'
         with:
           directory: charts
