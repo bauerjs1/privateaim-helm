@@ -1,0 +1,472 @@
+# Global values
+global:
+  hub:
+    endpoints:
+      auth: https://auth.privateaim.dev
+      core: https://core.privateaim.dev
+      messenger: https://messenger.privateaim.dev
+      storage: https://storage.privateaim.dev
+    auth:
+      robotUser:
+      robotSecret:
+  node:
+    ingress:
+      ## @param global.node.ingress.enabled Toggle whether ingress should be enabled
+      enabled: false
+      ## @param global.node.ingress.enabled Host name to be assigned to the Node UI (/) and Hub Adapter API (/api)
+      hostname:
+  keycloak:
+    ## @param global.keycloak.hostname Hostname for a separate instance of keycloak. Overrides the /keycloak subpath
+    ## Leave this blank unless you want to use your own IDP
+    hostname:
+
+# kong values
+kong:
+  image:
+    repository: kong
+    tag: "3.6"
+
+  env:
+    prefix: /kong_prefix/
+    database: postgres
+    # The default values for admin_listen include both ipv4 and ipv6 - if cluster does not support ipv6, it should be defined (minikube does not support ipv6)
+    # admin_listen: "127.0.0.1:8001"
+
+  admin:
+    enabled: true
+    type: ClusterIP
+    http:
+      enabled: true
+      servicePort: 80
+    tls:
+      enabled: false
+
+  manager:
+    enabled: false
+
+  portal:
+    enabled: false
+
+  portalapi:
+    enabled: false
+
+  proxy:
+    enabled: true
+    type: ClusterIP  
+    http:
+      enabled: true
+      servicePort: 80
+    tls:
+      enabled: false
+
+  ingressController:
+    enabled: false
+
+  # Sub-chart
+  postgresql:
+    enabled: true
+    nameOverride: kong-postgresql
+    auth:
+      database: kong
+      username: kong
+      password: kong
+      postgresPassword: supersecretpassword
+
+flame-node-result-service:
+  result-service-postgresql:
+    nameOverride:
+    fullnameOverride:
+    auth:
+      ## @param auth.enablePostgresUser Assign a password to the "postgres" admin user. Otherwise, remote access will be blocked for this user
+      ##
+      enablePostgresUser: true
+      ## @param auth.postgresPassword Password for the "postgres" admin user. Ignored if `auth.existingSecret` is provided
+      ##
+      postgresPassword: admin
+      username: postgres
+      password: postgres
+      database: postgres_db
+      existingSecret:
+      ## @param auth.secretKeys.adminPasswordKey Name of key in existing secret to use for PostgreSQL credentials. Only used when `auth.existingSecret` is set.
+      ## @param auth.secretKeys.userPasswordKey Name of key in existing secret to use for PostgreSQL credentials. Only used when `auth.existingSecret` is set.
+      ## @param auth.secretKeys.replicationPasswordKey Name of key in existing secret to use for PostgreSQL credentials. Only used when `auth.existingSecret` is set.
+      ##
+      secretKeys:
+        adminPasswordKey: postgres-password
+        userPasswordKey: password
+        replicationPasswordKey: replication-password
+      ## @param auth.usePasswordFiles Mount credentials as a files instead of using an environment variable
+      ##
+      usePasswordFiles: false
+  ## Hub services and data
+  hub:
+    ## @param hub.coreApi Hub core API endpoint
+    coreURL: https://core.privateaim.dev
+    ## @param hub.authURL Hub auth API endpoint
+    authURL: https://auth.privateaim.dev
+    ## @param hub.storageURL Hub storage API endpoint
+    storageURL: https://storage.privateaim.dev
+    ## Credentials used for retrieving a valid robot token from the hub
+    auth:
+      existingSecret:
+      robotUser:
+      robotSecret:
+
+  env:  
+    MINIO_USE_SSL: false
+    MINIO_BUCKET: flame
+    OIDC_CERTS_URL:
+    OIDC_CLIENT_ID_CLAIM_NAME: azp
+
+  minio:
+    # All possible values can be found at https://github.com/minio/minio/blob/master/helm/minio/values.yaml
+
+    ## Provide a name in place of minio for `app:` labels
+    nameOverride:
+
+    ## Provide a name to substitute for the full names of resources
+    fullnameOverride:
+
+    ## set kubernetes cluster domain where minio is running
+    clusterDomain: cluster.local
+
+    ## Set default rootUser, rootPassword
+    ## rootUser and rootPassword is generated when not set
+    ## Distributed MinIO ref: https://min.io/docs/minio/linux/operations/install-deploy-manage/deploy-minio-multi-node-multi-drive.html
+    ##
+    rootUser: admin
+    rootPassword: s3cr3t_p4ssw0rd
+
+    ## Use existing Secret that store following variables:
+    ##
+    ## | Chart var             | .data.<key> in Secret    |
+    ## |:----------------------|:-------------------------|
+    ## | rootUser              | rootUser                 |
+    ## | rootPassword          | rootPassword             |
+    ##
+    ## All mentioned variables will be ignored in values file.
+    ## .data.rootUser and .data.rootPassword are mandatory,
+    ## others depend on enabled status of corresponding sections.
+    existingSecret:
+
+    ## Path where PV would be mounted on the MinIO Pod
+    mountPath: /mnt/data
+
+    ## List of buckets to be created after minio install
+    ##
+    buckets: [
+      {
+        name: flame,
+        policy: none,
+        purge: false,
+        versioning: false,
+        objectlocking: false
+      }
+    ]
+      #   # Name of the bucket
+      # - name: bucket1
+      #   # Policy to be set on the
+      #   # bucket [none|download|upload|public]
+      #   policy: none
+      #   # Purge if bucket exists already
+      #   purge: false
+      #   # set versioning for
+      #   # bucket [true|false]
+      #   versioning: false # remove this key if you do not want versioning feature
+      #   # set objectlocking for
+      #   # bucket [true|false] NOTE: versioning is enabled by default if you use locking
+      #   objectlocking: false
+      # - name: bucket2
+      #   policy: none
+      #   purge: false
+      #   versioning: true
+      #   # set objectlocking for
+      #   # bucket [true|false] NOTE: versioning is enabled by default if you use locking
+      #   objectlocking: false
+
+
+    ## Set default image, imageTag, and imagePullPolicy. mode is used to indicate the
+    image:
+      repository: quay.io/minio/minio
+      tag: RELEASE.2024-03-03T17-50-39Z
+      pullPolicy: IfNotPresent
+
+    imagePullSecrets: []
+    ## Update strategy for Deployments
+    deploymentUpdate:
+      type: RollingUpdate
+      maxUnavailable: 0
+      maxSurge: 100%
+
+    mode: standalone
+    # Number of drives attached to a node
+    drivesPerNode: 1
+    # Number of MinIO containers running
+    replicas: 1
+    # Number of expanded MinIO clusters
+    pools: 1
+
+    resources:
+      requests:
+        memory: 1Gi
+
+    ## Update strategy for StatefulSets
+    statefulSetUpdate:
+      updateStrategy: RollingUpdate
+
+    persistence:
+      enabled: true
+      annotations: {}
+
+      ## A manually managed Persistent Volume and Claim
+      ## Requires persistence.enabled: true
+      ## If defined, PVC must be created manually before volume will be bound
+      existingClaim:
+
+      ## minio data Persistent Volume Storage Class
+      ## If defined, storageClassName: <storageClass>
+      ## If set to "-", storageClassName: "", which disables dynamic provisioning
+      ## If undefined (the default) or set to null, no storageClassName spec is
+      ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+      ##   GKE, AWS & OpenStack)
+      ##
+      ## Storage class of PV to bind. By default it looks for standard storage class.
+      ## If the PV uses a different storage class, specify that here.
+      storageClass:
+      volumeName:
+      accessMode: ReadWriteOnce
+      size: 10Gi
+
+# keycloak values
+keycloak:
+  auth:
+    adminUser: admin
+    adminPassword: admin
+
+  ingress:
+    ## @param ingress.enabled Enable ingress record generation for Keycloak
+    ##
+    enabled: false
+    ## @param ingress.hostname Default host for the ingress record
+    ##
+    hostname: ""
+
+  ## @param keycloak.proxyHeaders Set Keycloak proxy headers to "forwarded" or "xforwarded"
+  ## If you are using a reverse proxy for anything other than https passthrough, then this needs to be set else 403
+  proxyHeaders: ""
+
+  postgresql:
+    enabled: true
+    nameOverride: keycloak-postgresql
+    auth:
+      postgresPassword:   # Not needed since secret is provided
+      username: keycloak  # custom user
+      password: keycloak  # custom user pwd
+      database: keycloak
+      existingSecret: kc-password-secret  # admin password, requires "password" key in secret
+    architecture: standalone
+
+  keycloakConfigCli:
+    ## @param keycloakConfigCli.enabled Whether to enable keycloak-config-cli job
+    ## Must be set to true to apply settings below
+    enabled: true
+    existingConfigmap: flame-default-realm
+
+
+# hub-api-adapter Values
+flame-node-hub-adapter:
+  ## For defining ingress specific metadata
+  ingress:
+    ## @param ingress.enabled Enable ingress record generation for the Hub Adapter
+    ##
+    enabled: false
+    ## @param ingress.pathType Ingress path type
+    ##
+    pathType: Prefix
+    ## @param ingress.hostname Default host for the ingress record (evaluated as template)
+    ##
+    hostname:
+
+  ## Keycloak related information
+  idp:
+    ## @param idp.debug If true, the clientId and clientSecret will use pre-defined values
+    ## The clientSecret will be defined using the "static" k8s secret key
+    debug: false
+    ## @param idp.clientId Keycloak client ID for this service
+    clientId: hub-adapter
+    ## @param idp.clientSecret Keycloak client secret. Ignored if `idp.existingSecret` is provided
+    ## If not defined and no existingSecret provided, a random string is generated
+    clientSecret:
+    ## @param idp.existingSecret Existing k8s secret containing Keycloak secret for this client
+    ## idp.existingSecretKey should also be defined for custom k8s secret. Defaults to hub-adapter-kc-secret
+    existingSecret:
+    ## @param idp.existingSecretKey Key where the Keycloak secret is being stored inside the existing k8s secret
+    existingSecretKey:
+    ## @param idp.realm Keycloak realm that the client exists in
+    realm: flame
+    ## @param idp.host URL to keycloak service
+    ## Will be inferred using the Release.Name if not defined
+    host:
+
+  ## Downstream node services
+  node:
+    ## @param node.results Node results service endpoint
+    ## @param node.kong Node Kong admin service endpoint
+    ## @param node.po Node pod orchestrator service endpoint
+    results:
+    kong:
+    po:
+
+  ## Hub services and data
+  hub:
+    ## @param hub.coreApi Hub core API endpoint
+    coreApi: https://privateaim.net/core
+    ## @param hub.authApi Hub auth API endpoint
+    authApi: https://privateaim.net/auth
+    ## Credentials used for retrieving a valid token from the hub using a robot account
+    auth:
+      robotUser:
+      robotSecret:
+      ## @param hub.auth.existingSecret Existing k8s secret containing secret for given hub robot ID
+      ## The secret must have a key named "robotSecret"
+      existingSecret: ""
+
+flame-node-pod-orchestration:
+  api:
+    version: 0.1.0
+    domain: localhost
+  idp:
+    debug: false
+  env:
+    NODE_NAME: flame
+    NODE_KEY:
+    NODE_KEY_PW:
+
+    HARBOR_URL: dev-harbor.personalhealthtrain.de
+    HARBOR_PW: test
+    HARBOR_USER: test
+
+    KEYCLOAK_URL:
+    KEYCLOAK_REALM: flame
+
+    RESULT_CLIENT_ID: service1
+    RESULT_CLIENT_SECRET:
+
+    POSTGRES_HOST:
+  postgresql:
+    nameOverride:
+    fullnameOverride:
+    auth:
+      ## @param auth.enablePostgresUser Assign a password to the "postgres" admin user. Otherwise, remote access will be blocked for this user
+      ##
+      enablePostgresUser: true
+      ## @param auth.postgresPassword Password for the "postgres" admin user. Ignored if `auth.existingSecret` is provided
+      ##
+      postgresPassword: admin
+      username: postgres
+      password: postgres
+      database: postgres_db
+      existingSecret:
+      ## @param auth.secretKeys.adminPasswordKey Name of key in existing secret to use for PostgreSQL credentials. Only used when `auth.existingSecret` is set.
+      ## @param auth.secretKeys.userPasswordKey Name of key in existing secret to use for PostgreSQL credentials. Only used when `auth.existingSecret` is set.
+      ## @param auth.secretKeys.replicationPasswordKey Name of key in existing secret to use for PostgreSQL credentials. Only used when `auth.existingSecret` is set.
+      ##
+      secretKeys:
+        adminPasswordKey: postgres-password
+        userPasswordKey: password
+        replicationPasswordKey: replication-password
+      ## @param auth.usePasswordFiles Mount credentials as a files instead of using an environment variable
+      ##
+      usePasswordFiles: false
+
+flame-node-message-broker:
+  # Uncomment, if you want to use a specific storage class.
+  # Otherwise, the default one will be used.
+  # common:
+  #   storageClassName: yourStorageClassToBeUsed
+  broker:
+    AUTH_JWKS_URL:
+    HUB_BASE_URL:
+    HUB_AUTH_BASE_URL:
+    HUB_MESSENGER_BASE_URL:
+    HUB_AUTH_ROBOT_ID:
+    HUB_AUTH_ROBOT_SECRET:
+
+flame-node-ui:
+  env: production
+
+  ## For defining ingress specific metadata
+  ingress:
+    ## @param ingress.enabled Enable ingress record generation for the Node UI
+    ##
+    enabled: false
+    ## @param ingress.pathType Ingress path type
+    ##
+    pathType: ImplementationSpecific
+    ## @param ingress.hostname Default host for the ingress record (evaluated as template)
+    ##
+    hostname:
+    ## @param ingress.path Default file path for the ingress hostname
+    ##
+    path: /
+
+  ## Keycloak related information
+  idp:
+    ## @param idp.debug If true, the clientId and clientSecret will use pre-defined values
+    ## The clientSecret will be defined using the "static" k8s secret key
+    debug: false
+    ## @param idp.clientId Keycloak client ID for this service
+    clientId: node-ui
+    ## @param idp.clientSecret Keycloak client secret. Ignored if `idp.existingSecret` is provided
+    ## If not defined and no existingSecret provided, a random string is generated
+    clientSecret:
+    ## @param idp.existingSecret Existing k8s secret containing Keycloak secret for this client
+    ## idp.existingSecretKey should also be defined for custom k8s secret. Defaults to flame-service-secret
+    existingSecret:
+    ## @param idp.existingSecretKey Key where the Keycloak secret is being stored inside the existing k8s secret
+    existingSecretKey:
+    ## @param idp.realm Keycloak realm that the client exists in
+    realm: flame
+    ## @param idp.host URL to keycloak service
+    ## Will be set to localhost:8080 if not defined
+    host:
+    ## @param idp.service Service name of keycloak
+    ## Will be inferred using the Release.Name if not defined
+    service:
+
+  ## Downstream node services
+  node:
+    ## @param node.adapter Hub adapter endpoint
+    adapter:
+
+## node-data-store deploys dummy blaze (FHIR) and minio (S3) data stores for testing the Flame Node
+node-data-store:
+  enabled: true
+  
+  # blaze values
+  blaze:
+    service:
+      type: ClusterIP
+      port: 80
+    dataPopulatorJob:
+      enabled: true
+      env:
+        SYNTHEA_N_PATIENTS: 10
+        SYNTHEA_SEED: 3256262546
+        SYNTHEA_CLINICIAN_SEED: 3726451
+        TIMEOUT: 2
+
+  # minio values
+  minio:    
+      rootUser: admin
+      rootPassword: admin123
+
+      mode: standalone
+      replicas: 1
+      resources:
+        requests:
+          memory: 1Gi
+
+      persistence:
+        enabled: true
+        size: 5Gi    
