@@ -40,10 +40,6 @@ dependencies:
         version: 0.28.1
         repository: https://helm.releases.hashicorp.com
 
-    -   name: flame-hub-shared
-        repository: file://../flame-hub-shared
-        version: 0.1.0
-
     -   name: authup
         repository: file://../third-party/authup
         version: 0.1.0
