@@ -28,16 +28,16 @@ dependencies:
     repository: https://charts.konghq.com
     version: 2.38.0
   - name: flame-node-hub-adapter
-    repository: file://../flame-node-hub-api-adapter/helm/hub-adapter
+    repository: file://../flame-node-hub-api-adapter
     version: 0.1.0
   - name: flame-node-result-service
-    repository: file://../flame-node-result-service/helm/node-result-service
+    repository: file://../flame-node-result-service
     version: 0.1.0
   - name: flame-node-pod-orchestration
-    repository: file://../flame-node-pod-orchestration/helm/node-pod-orchestration
+    repository: file://../flame-node-pod-orchestration
     version: 0.1.0
   - name: flame-node-message-broker
-    repository: file://../flame-node-message-broker/helm
+    repository: file://../flame-node-message-broker
     version: 0.1.0
   - name: flame-node-ui
     repository: file://../flame-node-ui
@@ -46,6 +46,6 @@ dependencies:
     repository: file://../third-party/keycloak
     version: 24.4.10
   - name: flame-node-data-store
-    repository: file://../flame-node-data-store/helm
+    repository: file://../flame-node-data-store
     version: 0.1.0
     condition: node-data-store.enabled
