@@ -239,6 +239,9 @@ flame-node-result-service:
 
 # keycloak values
 keycloak:
+  ## @param keycloak.enabled Whether to deploy the bundled Keycloak instance
+  enabled: true
+
   auth:
     adminUser: admin
     adminPassword: admin
