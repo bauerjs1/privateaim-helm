@@ -385,8 +385,9 @@ flame-node-pod-orchestration:
 flame-node-message-broker:
   # Uncomment, if you want to use a specific storage class.
   # Otherwise, the default one will be used.
-  # common:
-  #   storageClassName: yourStorageClassToBeUsed
+  # db:
+  #   persistence:
+  #     storageClass: yourStorageClassToBeUsed
   broker:
     AUTH_JWKS_URL:
     HUB_BASE_URL:
