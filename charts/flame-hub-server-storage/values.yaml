@@ -5,5 +5,5 @@ global:
 ingress:
     enabled: false
     hostname: ""
-    path: ""
+    path: "/"
     pathType: "Prefix"
