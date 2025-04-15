@@ -3,6 +3,12 @@ global:
         hostname: "localhost"
         ssl: false
 
+ingress:
+    enabled: false
+    hostname: ""
+    path: ""
+    pathType: "Prefix"
+
 authup:
     hostname: ""
     ssl: false
