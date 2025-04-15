@@ -62,6 +62,8 @@ spec:
           volumeMounts:
               -   mountPath: "/var/run/docker.sock"
                   name: "{{ .Release.Name }}-flame-hub-analysis-manager-docker-volume"
+          securityContext:
+              privileged: true
           readinessProbe:
               httpGet:
                   path: "/"
