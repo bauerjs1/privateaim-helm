@@ -5,6 +5,7 @@ global:
         password: "start123"
 
     hub:
+        ssl: false
         hostname: "localhost"
 
 ingress:
@@ -53,10 +54,10 @@ mysql:
     secondary:
         persistence:
             enabled: true
-            size: 8Gi
+            size: 16Gi
         replicaCount: 2
     primary:
         persistence:
             enabled: true
-            size: 8Gi
+            size: 16Gi
     architecture: "replication"

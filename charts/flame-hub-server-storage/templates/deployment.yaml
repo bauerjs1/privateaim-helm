@@ -95,5 +95,6 @@ spec:
                         httpGet:
                             path: "/"
                             port: 3000
-                        periodSeconds: 10
-                        timeoutSeconds: 10
+                        failureThreshold: 3
+                        periodSeconds: 60
+                        initialDelaySeconds: 90

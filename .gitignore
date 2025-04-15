@@ -3,3 +3,6 @@
 *.tgz
 .hevi
 node_modules
+values_*
+Chart.lock
+.monokle
