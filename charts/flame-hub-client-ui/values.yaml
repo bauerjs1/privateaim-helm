@@ -1,15 +1,20 @@
 global:
     hub:
         hostname: "localhost"
+        ssl: false
 
 authup:
     hostname: ""
+    ssl: false
 
 core:
     hostname: ""
+    ssl: false
 
 messenger:
     hostname: ""
+    ssl: false
 
 storage:
     hostname: ""
+    ssl: false
